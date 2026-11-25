@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Register | GAME ARENA</title>
+    <link rel="icon" href="assets/logos/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Figtree:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <script src="js/page-transitions.js" defer></script>
+</head>
+
+<body class="au" data-mode="register">
+    <iframe class="home-underlay" src="index.html" title="GAME ARENA Home" aria-hidden="true" tabindex="-1" onload="this.dataset.ready='true'"></iframe>
+    <aside>
+        <div class="shape s1"></div>
+        <div class="auth-branding">
+            <a class="brand auth-brand" href="index.html"><img src="assets/logos/logo.svg" alt="" width="112" height="112"><span>GAME ARENA</span></a>
+        </div>
+        <div class="auth-promo">
+            <h1 id="auth-heading" class="in">Your squad is waiting.</h1>
+            <small>Sample data. No real accounts are created.</small>
+        </div>
+    </aside>
+    <main>
+        <form class="fm auth-card auth-form" data-form="register" action="login.html" method="get" aria-hidden="true" inert novalidate>
+            <h2>Create account</h2>
+            <p>Join in under a minute. Use the demo login afterwards.</p>
+            <label class="fld">Username<input id="reg-username" name="username" type="text" required minlength="3" placeholder="ShadowKira" autocomplete="username" aria-describedby="reg-username-error"><small class="form-error" id="reg-username-error"></small></label>
+            <label class="fld">Email<input id="reg-email" name="email" type="email" required placeholder="you@email.com" autocomplete="email" aria-describedby="reg-email-error"><small class="form-error" id="reg-email-error"></small></label>
+            <label class="fld">Password<div class="password-control"><input id="reg-password" name="password" type="password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}" title="Use at least 8 characters with an uppercase letter, a lowercase letter, and a number." placeholder="At least 8 characters" autocomplete="new-password" aria-describedby="reg-password-error"><button class="toggle-password" type="button" data-password-toggle aria-label="Show password" aria-controls="reg-password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle><path class="eye-slash" d="m4 4 16 16"></path></svg></button></div><small class="form-error" id="reg-password-error"></small></label>
+            <label class="fld">Confirm password<div class="password-control"><input id="reg-confirm-password" name="confirm-password" type="password" required minlength="8" placeholder="Repeat password" autocomplete="new-password" aria-describedby="reg-confirm-password-error"><button class="toggle-password" type="button" data-password-toggle aria-label="Show password" aria-controls="reg-confirm-password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle><path class="eye-slash" d="m4 4 16 16"></path></svg></button></div><small class="form-error" id="reg-confirm-password-error"></small></label>
+            <label class="fld">Preferred game<select id="reg-game" name="game" required aria-describedby="reg-game-error">
+                    <option value="">Choose a game</option>
+                    <option>Valorant</option>
+                    <option>BGMI</option>
+                    <option>Counter-Strike 2</option>
+                </select><small class="form-error" id="reg-game-error"></small></label>
+            <div class="row terms-row"><label class="terms-field"><span><input id="reg-terms" name="terms" type="checkbox" required aria-describedby="reg-terms-error"> I accept the terms and conditions</span><small class="form-error" id="reg-terms-error"></small></label></div>
+            <button class="btn p" type="submit">Create account</button>
+            <p class="form-success" role="status" aria-live="polite"><span class="success-check" aria-hidden="true">✓</span><span><strong data-success-copy></strong><small>Demo only. Your details are not stored.</small></span></p>
+            <p class="alt"><a class="auth-switch" href="login.html" data-switch="login">Log in</a></p>
+        </form>
+        <form class="fm auth-card auth-form" data-form="login" action="profile.html" method="get" aria-hidden="true" inert novalidate>
+            <h2>Log in</h2>
+            <p>Welcome back. Pick up where you left off.</p>
+            <div class="demo"><b>Demo account</b><br>Email: demo@gamearena.gg<br>Password: Arena@2026</div>
+            <label class="fld">Email or username<input id="login-identifier" name="username" type="text" required pattern="demo@gamearena\.gg|ShadowKira"
+                    title="Use the demo account: demo@gamearena.gg" autocomplete="username" placeholder="demo@gamearena.gg" aria-describedby="login-identifier-error"><small class="form-error" id="login-identifier-error"></small></label>
+            <label class="fld">Password<div class="password-control"><input id="login-password" name="password" type="password" required pattern="Arena@2026"
+                    title="Use the demo password: Arena@2026" autocomplete="current-password" placeholder="Your password" aria-describedby="login-password-error"><button class="toggle-password" type="button" data-password-toggle aria-label="Show password" aria-controls="login-password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7S18.4 19 12 19 2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle><path class="eye-slash" d="m4 4 16 16"></path></svg></button></div><small class="form-error" id="login-password-error"></small></label>
+            <div class="row"><label><input type="checkbox"> Remember me</label><a href="mailto:support@gamearena.gg">Forgot password?</a></div>
+            <button class="btn p" type="submit">Log in</button>
+            <p class="form-success login-success" role="status" aria-live="polite"><span class="success-check" aria-hidden="true">✓</span><span><strong>Login successful. Opening GAME ARENA…</strong></span></p>
+            <p class="alt"><a class="auth-switch" href="register.html" data-switch="register">Create an account</a></p>
+        </form>
+    </main>
+    <script src="js/game-arena-data.js" defer></script>
+    <script src="js/auth.js" defer></script>
+</body>
+
+</html>

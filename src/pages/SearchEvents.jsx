@@ -1,0 +1,109 @@
+import { useEffect, useState } from "react";
+import { Link } from "../components/TransitionLink.jsx";
+import { getAllTournaments, getTournamentRegistrationState, getTournamentStatus, subscribeToTournamentData } from "../data/tournaments.js";
+import { getTournamentParticipantCount, subscribeToData } from "../data/gameArenaData.js";
+
+const gameClasses = { valorant: "gv", bgmi: "gb", cs2: "gc" };
+const statusClasses = { upcoming: "su", ongoing: "so", completed: "sd" };
+const statusLabels = { upcoming: "Upcoming tournaments", ongoing: "Ongoing tournaments", completed: "Completed tournaments" };
+const currency = (value) => value === 0 ? "Free" : `₹${Number(value).toLocaleString("en-IN")}`;
+const dateLabel = (value) => new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+
+function TournamentCard({ tournament, filters }) {
+  const lifecycle = getTournamentStatus(tournament);
+  const status = lifecycle === "registration-closed" ? "upcoming" : lifecycle;
+  const registration = getTournamentRegistrationState(tournament, new Date(), getTournamentParticipantCount(tournament));
+  const matches = (filters.game === "all" || filters.game === tournament.gameKey)
+    && (filters.status === "all" || filters.status === status)
+    && `${tournament.name} ${tournament.game}`.toLowerCase().includes(filters.query.trim().toLowerCase());
+  const gameClass = gameClasses[tournament.gameKey];
+  const sharedArtwork = tournament.id === "arena-masters-valorant-open";
+  const bannerClass = `bn ${gameClass}${sharedArtwork ? " shared-tournament-art" : ""}`;
+  const badgeClass = status === "ongoing" ? "t-l" : registration.available ? "t-o" : "t-d";
+  const badge = status === "ongoing" ? "Ongoing" : status === "completed" ? "Completed" : registration.label;
+  const participantCount = tournament.participants.capacity
+    ? `${tournament.participants.registered} / ${tournament.participants.capacity} ${tournament.participants.label}`
+    : `${tournament.participants.registered} ${tournament.participants.label}`;
+  const dateText = status === "upcoming"
+    ? `Closes ${dateLabel(tournament.registrationDeadline)}`
+    : status === "ongoing" ? "In progress" : `Ended ${dateLabel(tournament.end)}`;
+
+  return <article className={`card tc ${gameClass} ${statusClasses[status]} rv`} data-tournament-id={tournament.id} hidden={!matches}>
+    <div className={bannerClass} data-t={tournament.banner}>
+      <span className={`tag ${badgeClass}`}>{badge}</span>
+    </div>
+    <div className="pad">
+      <p>{tournament.game}</p>
+      <h3>{tournament.name}</h3>
+      <div className="meta">
+        <div><b>{currency(tournament.prizePool)}</b><small>Prize pool</small></div>
+        <div><b>{currency(tournament.entryFee)}</b><small>Entry fee</small></div>
+        <div><b>{participantCount}</b><small>Participants</small></div>
+        <div><b style={{ fontSize: "1.05rem" }}>{dateText}</b><small>Date</small></div>
+      </div>
+      <div className="tournament-card-actions">
+        {registration.available
+          ? <Link className="btn s sm" to={`/tournament/${tournament.id}`} state={{ ...(sharedArtwork ? { transitionType: "shared" } : {}), focusRegistration: true }}>Register</Link>
+          : <button className="btn s sm" type="button" disabled aria-describedby={`registration-note-${tournament.id}`}>Register</button>}
+        <Link className="btn p sm" to={`/tournament/${tournament.id}`} state={sharedArtwork ? { transitionType: "shared" } : undefined}>View details</Link>
+      </div>
+      {!registration.available && status === "upcoming" && <small className="tournament-card-registration-note" id={`registration-note-${tournament.id}`}>{registration.message}</small>}
+    </div>
+  </article>;
+}
+
+export default function SearchEvents() {
+  const [filters, setFilters] = useState({ query: "", game: "all", status: "all" });
+  const [tournaments, setTournaments] = useState([]);
+  useEffect(() => {
+    let active = true;
+    const refresh = () => getAllTournaments().then((items) => { if (active) setTournaments(items); });
+    refresh();
+    const unsubscribe = subscribeToData(refresh);
+    const unsubscribeTournaments = subscribeToTournamentData(refresh);
+    return () => { active = false; unsubscribe(); unsubscribeTournaments(); };
+  }, []);
+  return (
+    <main>
+      <div className="w">
+        <div className="ph in">
+          <h1>Tournaments</h1>
+          <p>Browse open brackets, follow live events and revisit finished ones.</p>
+        </div>
+        <section style={{ paddingTop: "24px" }}>
+          <div className="fb rv">
+            <input className="search" type="search" placeholder="Search tournaments" aria-label="Search tournaments" value={filters.query} onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))} />
+            <p>Game</p>
+            <div className="chips" role="radiogroup">
+              <input type="radio" name="g" id="g-a" value="all" checked={filters.game === "all"} onChange={() => setFilters((current) => ({ ...current, game: "all" }))} /><label htmlFor="g-a">All games</label>
+              <input type="radio" name="g" id="g-v" value="valorant" checked={filters.game === "valorant"} onChange={() => setFilters((current) => ({ ...current, game: "valorant" }))} /><label htmlFor="g-v">Valorant</label>
+              <input type="radio" name="g" id="g-b" value="bgmi" checked={filters.game === "bgmi"} onChange={() => setFilters((current) => ({ ...current, game: "bgmi" }))} /><label htmlFor="g-b">BGMI</label>
+              <input type="radio" name="g" id="g-c" value="cs2" checked={filters.game === "cs2"} onChange={() => setFilters((current) => ({ ...current, game: "cs2" }))} /><label htmlFor="g-c">Counter-Strike 2</label>
+            </div>
+            <p>Status</p>
+            <div className="chips" role="radiogroup">
+              <input type="radio" name="s" id="s-a" value="all" checked={filters.status === "all"} onChange={() => setFilters((current) => ({ ...current, status: "all" }))} /><label htmlFor="s-a">All</label>
+              <input type="radio" name="s" id="s-u" value="upcoming" checked={filters.status === "upcoming"} onChange={() => setFilters((current) => ({ ...current, status: "upcoming" }))} /><label htmlFor="s-u">Upcoming</label>
+              <input type="radio" name="s" id="s-o" value="ongoing" checked={filters.status === "ongoing"} onChange={() => setFilters((current) => ({ ...current, status: "ongoing" }))} /><label htmlFor="s-o">Ongoing</label>
+              <input type="radio" name="s" id="s-d" value="completed" checked={filters.status === "completed"} onChange={() => setFilters((current) => ({ ...current, status: "completed" }))} /><label htmlFor="s-d">Completed</label>
+            </div>
+          </div>
+          {Object.entries(statusLabels).map(([status, heading]) => {
+            const items = tournaments.filter((tournament) => {
+              const lifecycle = getTournamentStatus(tournament);
+              const sectionStatus = lifecycle === "registration-closed" ? "upcoming" : lifecycle;
+              return !["draft", "cancelled"].includes(tournament.status) && sectionStatus === status;
+            });
+            if (!items.length) return null;
+            return <div className={`grp ${statusClasses[status]}`} key={status}>
+              <h2 className="rv">{heading}</h2>
+              <div className="g">
+                {items.map((tournament) => <TournamentCard key={tournament.id} tournament={tournament} filters={filters} />)}
+              </div>
+            </div>;
+          })}
+        </section>
+      </div>
+    </main>
+  );
+}
